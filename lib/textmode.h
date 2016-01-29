@@ -1,5 +1,5 @@
 /********************************************************
- * 			GoOS C library - textmode.h
+ *	GoOS C library - textmode.h
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -14,6 +14,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdgcl.h>
+#include <stdbool.h>
 
 /* Textmode colors */
 typedef enum {
@@ -43,18 +44,30 @@ extern size_t 	tmColumn;
 extern uint8_t	tmColor;
 extern uint16_t	*tmBuffer;
 
+/* Cursor struct */
+typedef struct {
+	size_t column;
+	size_t row;
+} tmCursor_t;
+
+
 /* Function prototypes */
 
-void 		tmInit		(void);
-void 		tmWriteAt	(char c, uint8_t color, size_t row, size_t column);
-void		tmWriteChr	(char c);
-void 		tmWrite 	(const char* str);
-void		tmScroll	(void);
-void		tmWriteInt	(int value);
-void		tmWriteUInt	(uint value);
-void		tmWriteHex	(uint value);
-void		tmWriteBin	(uint value);
-void		tmWriteOct	(uint value);
+void 	tmInit		(uint);
+void 	tmWriteAt	(char, uint8_t, size_t, size_t);
+void	tmWriteChr	(char c);
+void 	tmWrite 	(const char *);
+void	tmScroll	(void);
+void	tmWriteInt	(int);
+void	tmWriteUInt	(uint);
+void	tmWriteHex	(uint);
+void	tmWriteBin	(uint);
+void	tmWriteOct	(uint);
+void	tmOkFail	(bool);
+void	tmCRLF		(void);
+void    tmSetCursor	(size_t, size_t);
+
+tmCursor_t 	tmGetCursor (void);
 
 /* Inline functions */
 

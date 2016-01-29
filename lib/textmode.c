@@ -1,5 +1,5 @@
 /********************************************************
- * 			GoOS C library - textmode.c
+ *	GoOS C library - textmode.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -11,6 +11,8 @@
 #include <textmode.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <bda.h>
 
 size_t 		tmRow;
 size_t 		tmColumn;
@@ -19,19 +21,22 @@ uint16_t	*tmBuffer;
 
 // Initialize 
 void
-tmInit(void)
+tmInit(uint vidmem_addr)
 {
-	tmRow = 0;
-	tmColumn = 75;
+	tmCursor_t cursor = tmGetCursor();
+
+	tmRow = cursor.row;
+	tmColumn = cursor.column;
+
     tmColor = tmMakeColor(LIGHT_GREY, BLACK);
-    tmBuffer = (uint16_t *) 0xB8000;
+    tmBuffer = (uint16_t *) vidmem_addr;
 }
 
 // Full write
 void
 tmWriteAt(char c, uint8_t color, size_t row, size_t column)
 {
-	const size_t index = row * TEXTMODE_WIDTH + column;
+	size_t index = row * TEXTMODE_WIDTH + column;
 	tmBuffer[index] = tmMakeEntry(c, color);
 }
 
@@ -39,17 +44,41 @@ tmWriteAt(char c, uint8_t color, size_t row, size_t column)
 void
 tmWriteChr(char c)
 {
-	tmWriteAt(c, tmColor, tmRow, tmColumn);
-
-	if (++tmColumn == TEXTMODE_WIDTH)
+	switch (c)
 	{
+	case '\r':
 		tmColumn = 0;
+		break;
+	case '\n':
 		if (++tmRow == TEXTMODE_HEIGHT)
 		{
 			tmScroll();
 			tmRow--;
+		}	
+		break;
+	default:
+		tmWriteAt(c, tmColor, tmRow, tmColumn);
+
+		if (++tmColumn == TEXTMODE_WIDTH)
+		{
+			tmColumn = 0;
+			if (++tmRow == TEXTMODE_HEIGHT)
+			{
+				tmScroll();
+				tmRow--;
+			}
 		}
-	}
+	} // switch (c)
+
+	tmSetCursor(tmColumn, tmRow);
+}
+
+// Write new line
+void
+tmCRLF(void)
+{
+	tmWriteChr(13);
+	tmWriteChr(10);
 }
 
 // Write string
@@ -120,4 +149,88 @@ tmWriteOct(uint value)
 	char str[(uint) utoa(value, (char *) 0, 8)];
 	utoa(value, (char *) str, 8);
 	tmWrite((char *) str);			
+}
+
+// Write bool
+void
+tmWriteBool(bool value)
+{
+	if (value)
+		tmWrite("true");
+	else
+		tmWrite("false");
+}
+
+// Write OK/Fail 
+void
+tmOkFail(bool ok)
+{
+	if (ok)
+		tmColumn = TEXTMODE_WIDTH - 4;
+	else
+		tmColumn = TEXTMODE_WIDTH - 6;
+	
+	tmWriteChr('[');
+	
+	uint8_t oldcolor = tmColor;
+
+	if (ok)
+	{
+		tmColor = tmMakeColor(GREEN, oldcolor >> 4);
+		tmWrite("OK");
+	} else {
+		tmColor = tmMakeColor(RED, oldcolor >> 4);
+		tmWrite("FAIL");
+	}
+
+	tmColor = oldcolor;
+	tmWriteChr(']');
+}
+
+// Write buffer 
+void
+tmWriteBuffer(char *buffer, size_t len)
+{
+	for (size_t i = 0; i < len; i++)
+		tmWriteChr(buffer[i]);
+}
+
+// Set cursor
+void
+tmSetCursor(size_t column, size_t row)
+{
+	uint16_t pos = (row * TEXTMODE_WIDTH) + column;
+ 	uint16_t ioport = bda_vga_ioport;
+
+	outb(ioport, 0x0F);
+	io_wait();
+ 	outb(ioport + 1, (uint8_t) (pos & 0xFF));
+ 	io_wait();
+
+ 	outb(ioport, 0x0E);
+ 	io_wait();
+ 	outb(ioport + 1, (uint8_t) ((pos >> 8) & 0xFF));
+ 	io_wait();
+}
+
+// Get cursor
+tmCursor_t
+tmGetCursor()
+{
+	uint16_t pos;
+	uint16_t ioport = bda_vga_ioport;
+	tmCursor_t result;
+
+	outb(ioport, 0x0F);
+	io_wait();
+	pos = inb(ioport+1);
+
+	outb(ioport, 0x0E);
+	io_wait();
+	pos += (inb(ioport+1) << 8);
+
+	result.column = pos % TEXTMODE_WIDTH;
+	result.row = pos / TEXTMODE_WIDTH;
+
+	return result;
 }

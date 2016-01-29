@@ -20,7 +20,12 @@ AOPS = --warn --fatal-warnings
 COPS = -Wall -ffreestanding -O2 -nostdlib
 
 # Library objects
-LIBOBJS = ../lib/textmode.c.ldr.o ../lib/string/strlen.c.ldr.o ../lib/string/memcpy.c.ldr.o ../lib/stdlib/utoa.c.ldr.o ../lib/stdlib/itoa.c.ldr.o
+LIBOBJS = 	../lib/textmode.c.ldr.o \
+			../lib/string/strlen.c.ldr.o \
+			../lib/string/memcpy.c.ldr.o \
+			../lib/stdlib/utoa.c.ldr.o \
+			../lib/stdlib/itoa.c.ldr.o \
+			../lib/cpuinfo.c.ldr.o
 
 # Source objects
 OBJS = boot.s.ldr.o ldr.c.ldr.o

@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS Loader - ldr.c
+ *	GoOS Loader - ldr.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -12,20 +12,42 @@
 #include "textmode.h"
 #include "multiboot.h" // thirdparty
 #include <stdlib.h>
+#include <bda.h>
+#include <cpuid.h>
 
 void
 ldrMain(void)
-{
-	tmInit();
-	tmRow = 24;
-	tmColumn = 75;
-	tmWrite("Hello, World! = ");
+{	
+	// uneG letn Ieni
+	// Genu	ntel ineI
+	// BX+DX+CX = GenuineIntel :) cpuinfo opcode works
 
-	tmWriteUInt(17);
-	tmWrite(" - ");
-	tmWriteHex(17);
-	tmWrite(" - ");
-	tmWriteBin(17);
-	tmWrite(" - ");
-	tmWriteOct(17);
+	tmInit(0xB8000);
+
+	tmWriteHex(bda_vga_ioport);
+	tmWriteChr(' ');
+
+	tmCursor_t curpos = tmGetCursor();
+
+	tmWriteUInt(curpos.column);
+	tmWriteChr(':');
+	tmWriteUInt(curpos.row);
+	tmWrite(" -> ");
+
+	uint a = 0;
+	uint b;
+	uint c;
+	uint d;
+
+	cpuinfo_opcode(&a, &b, &c, &d);
+
+	tmWriteHex(a);
+	tmWriteChr(' ');
+	tmWriteHex(b);
+
+	tmWriteChr(' ');
+	tmWriteHex(c);
+
+	tmWriteChr(' ');
+	tmWriteHex(d);
 }
