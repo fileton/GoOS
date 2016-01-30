@@ -1,5 +1,5 @@
 /********************************************************
- *	GoOS C library - cpuid.h
+ *	GoOS C library - cpuid.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -8,13 +8,21 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#ifndef __CPUID_GCL_H__
-#define __CPUID_GCL_H__ 1
-
-#include <cpuid.h>
 #include <stdgcl.h>
 
-void cpuid_opcode(uint *a, uint *b, uint *c, uint *d);	// Run opcode
+/* 
+	Various functions for getting detailed CPU information.
+*/
 
+/* Check if it's an Intel CPU  */
+bool
+cpuinfo_isIntel()
+{
+	unsigned int a = 0, b = 0, c = 0, d = 0;
+	
+	__get_cpuid(0, &a, &b, &c, &d);
 
-#endif
+	return ((b == signature_INTEL_ebx) && \
+			(c == signature_INTEL_ecx) && \
+			(d == signature_INTEL_edx));
+}

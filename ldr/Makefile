@@ -19,35 +19,28 @@ AS = $(TARGET)-as
 AOPS = --warn --fatal-warnings
 COPS = -Wall -ffreestanding -O2 -nostdlib
 
-# Library objects
-LIBOBJS = 	../lib/textmode.c.ldr.o \
-			../lib/string/strlen.c.ldr.o \
-			../lib/string/memcpy.c.ldr.o \
-			../lib/stdlib/utoa.c.ldr.o \
-			../lib/stdlib/itoa.c.ldr.o \
-			../lib/cpuinfo.c.ldr.o
-
 # Source objects
-OBJS = boot.s.ldr.o ldr.c.ldr.o
+OBJS = boot.s.o ldr.c.o
 
 # Built loader
-all: ldr.elf ldr.asm
+all: clean ldr.elf ldr.asm
 
 # Cleanup
 clean:
-	rm -rf *.ldr.o
+	rm -rf *.o
 	rm -rf *.asm
 
 ldr.asm: ldr.elf
 	objdump -d ../iso/boot/ldr.elf > ldr.asm
 
-ldr.elf: $(LIBOBJS) $(OBJS)
-	$(GCC) -T ldr.ld -o ../iso/boot/ldr.elf $(COPS) $(OBJS) $(LIBOBJS) -lgcc
+ldr.elf: $(OBJS)
+	$(GCC) -T ldr.ld -o ../iso/boot/ldr.elf $(COPS) $(OBJS) ../gcl/lib/gcj-i686.lib -lgcc
+	rm -rf $(OBJS)
 
 # Compile C sources
-%.c.ldr.o: %.c  
-	$(GCC) $(COPS) -o $@ -c $< -I. -I../lib
+%.c.o: %.c  
+	$(GCC) $(COPS) -o $@ -c $< -I. -I../gcl/include
 
 # Compile assembly sources
-%.s.ldr.o: %.s 
-	$(AS) $(AOPS) -o $@ -c $< -I. -I../lib
+%.s.o: %.s 
+	$(AS) $(AOPS) -o $@ -c $< -I. -I../gcl/include

@@ -11,10 +11,12 @@
 #ifndef __TEXTMODE_H__
 #define __TEXTMODE_H__ 1 
 
-#include <stddef.h>
-#include <stdint.h>
 #include <stdgcl.h>
-#include <stdbool.h>
+
+/*
+	Provides functions for writing to the VGA textmode
+	memory area and controlling the textmode cursor. 
+*/
 
 /* Textmode colors */
 typedef enum {
@@ -53,19 +55,19 @@ typedef struct {
 
 /* Function prototypes */
 
-void 	tmInit		(uint);
+void 	tmInit		(uint_t);
 void 	tmWriteAt	(char, uint8_t, size_t, size_t);
 void	tmWriteChr	(char c);
 void 	tmWrite 	(const char *);
 void	tmScroll	(void);
-void	tmWriteInt	(int);
-void	tmWriteUInt	(uint);
-void	tmWriteHex	(uint);
-void	tmWriteBin	(uint);
-void	tmWriteOct	(uint);
-void	tmOkFail	(bool);
+void	tmWriteInt	(int_t);
+void	tmWriteUInt	(uint_t);
+void	tmWriteHex	(uint_t);
+void	tmWriteBin	(uint_t);
+void	tmWriteOct	(uint_t);
 void	tmCRLF		(void);
 void    tmSetCursor	(size_t, size_t);
+bool	tmBoolStr	(bool value, char *trueStr, char *falseStr);
 
 tmCursor_t 	tmGetCursor (void);
 

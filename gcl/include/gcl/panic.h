@@ -1,5 +1,5 @@
 /********************************************************
- *	GoOS C library - cpuid.c
+ *	GoOS C library - gclpanic.h
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -9,13 +9,9 @@
  ********************************************************/
 
 #include <stdgcl.h>
-#include <cpuinfo.h>
 
-void 
-cpuinfo_opcode(uint *a, uint *b, uint *c, uint *d)
-{
+/* Write textmode panic string and abort execution */
+void gclPanicString(char *str);
 
-  __asm__ __volatile__ ("cpuid"
-         /* Output */ : "=a" (*a), "=b" (*b), "=c" (*c), "=d" (*d)
-         /* Input  */ : "a" (*a), "c" (*c) );
-}
+/* Extention on tmBoolStr to write panic message and abort execution if 'value' is false. */
+void gclPanicBoolStr(bool check, char *tstr, char *fstr, char *pstr); 

@@ -11,12 +11,11 @@
 #ifndef __STDLIB_H__
 #define __STDLIB_H__ 1
 
-#include <stdint.h>
 #include <stdgcl.h>
 
 void *sbrk	(intptr_t increment);	// Simplest memory manager
-void *itoa	(int input, char *buffer, int radix); 	// Int to String
-void *utoa	(uint input, char *buffer, int radix); 	// Unsigned Int to String
+void *itoa	(int_t input, char *buffer, int_t radix); 	// Int to String
+void *utoa	(uint_t input, char *buffer, int_t radix); 	// Unsigned Int to String
 
 extern uintptr_t HEAP_SIZE;		// Size of heap
 extern uintptr_t HEAP_START; 	// Start of heap

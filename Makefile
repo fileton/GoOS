@@ -1,5 +1,5 @@
 #********************************************************
-#* 					GoOS - Makefile
+#*	GoOS - Makefile
 #******************************************************** 
 #* Copyright (c) 2016, Gert Nutterts
 #* All rights reserved
@@ -9,15 +9,18 @@
 #********************************************************/
 
 
-all: clean ldr cdrom 
+all: clean lib ldr cd 
 
 clean:
-	rm -rf iso/* *.iso lib/*.o lib/string/*.o lib/stdlib/*.o
-	cd ldr && make clean 
+	rm -rf iso/* *.iso
 
 ldr: iso/boot/ldr.elf
 
-cdrom: GoOS.iso
+cd: GoOS.iso
+
+lib:
+	cd gcl && make TARGET=i686
+	cd gcl && make TARGET=x86_64
 
 iso/boot/ldr.elf:
 	mkdir -p iso/boot

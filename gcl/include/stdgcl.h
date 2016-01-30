@@ -11,9 +11,24 @@
 #ifndef __STDGCL_H__
 #define __STDGCL_H__ 1
 
+/* Freestanding C headers */
 #include <stdint.h>
+#include <stddef.h>
+#include <stdbool.h>
+#include <cpuid.h>
 
-typedef unsigned int uint;
+/* GCL headers */
+#include <gcl/types.h>
+#include <gcl/asm.h>
+
+#include <string.h>
+#include <stdlib.h>
+
+#include <gcl/panic.h>
+#include <gcl/cpuid.h>
+
+#include <gcl/textmode.h>
+#include <gcl/bda.h>
 
 /* I/O  */
 

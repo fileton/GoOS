@@ -8,11 +8,12 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#include <textmode.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <bda.h>
+/*
+	Provides functions for writing to the VGA textmode
+	memory area and controlling the textmode cursor. 
+*/
+
+#include <stdgcl.h>
 
 size_t 		tmRow;
 size_t 		tmColumn;
@@ -21,7 +22,7 @@ uint16_t	*tmBuffer;
 
 // Initialize 
 void
-tmInit(uint vidmem_addr)
+tmInit(uint_t vidmem_addr)
 {
 	tmCursor_t cursor = tmGetCursor();
 
@@ -107,27 +108,27 @@ tmScroll(void)
 
 // Write Int
 void
-tmWriteInt(int value)
+tmWriteInt(int_t value)
 {
-	char str[(uint) itoa(value, (char *) 0, 10)];
+	char str[(uint_t) itoa(value, (char *) 0, 10)];
 	itoa(value, (char *) str, 10);
 	tmWrite((char *) str);
 }
 
 // Write unsigned int
 void
-tmWriteUInt(uint value)
+tmWriteUInt(uint_t value)
 {
-	char str[(uint) utoa(value, (char *) 0, 10)];
+	char str[(uint_t) utoa(value, (char *) 0, 10)];
 	utoa(value, (char *) str, 10);
 	tmWrite((char *) str);	
 }
 
 // Write hex
 void
-tmWriteHex(uint value)
+tmWriteHex(uint_t value)
 {
-	char str[(uint) utoa(value, (char *) 0, 16)];
+	char str[(uint_t) utoa(value, (char *) 0, 16)];
 	utoa(value, (char *) str, 16);
 	tmWrite("0x");
 	tmWrite((char *) str);		
@@ -135,18 +136,18 @@ tmWriteHex(uint value)
 
 // Write binary
 void
-tmWriteBin(uint value)
+tmWriteBin(uint_t value)
 {
-	char str[(uint) utoa(value, (char *) 0, 2)];
+	char str[(uint_t) utoa(value, (char *) 0, 2)];
 	utoa(value, (char *) str, 2);
 	tmWrite((char *) str);			
 }
 
 // Write octal
 void
-tmWriteOct(uint value)
+tmWriteOct(uint_t value)
 {
-	char str[(uint) utoa(value, (char *) 0, 8)];
+	char str[(uint_t) utoa(value, (char *) 0, 8)];
 	utoa(value, (char *) str, 8);
 	tmWrite((char *) str);			
 }
@@ -159,6 +160,35 @@ tmWriteBool(bool value)
 		tmWrite("true");
 	else
 		tmWrite("false");
+}
+
+// Check bool and write trueStr(ing) or falseStr(ing)
+// Returns boolean value 
+bool
+tmBoolStr(bool value, char *trueStr, char *falseStr)
+{
+	if (value)
+		tmColumn = TEXTMODE_WIDTH - strlen(trueStr) - 2;
+	else
+		tmColumn = TEXTMODE_WIDTH - strlen(falseStr) - 2;
+	
+	tmWriteChr('[');
+	
+	uint8_t oldcolor = tmColor;
+
+	if (value)
+	{
+		tmColor = tmMakeColor(GREEN, oldcolor >> 4);
+		tmWrite(trueStr);
+	} else {
+		tmColor = tmMakeColor(RED, oldcolor >> 4);
+		tmWrite(falseStr);
+	}
+
+	tmColor = oldcolor;
+	tmWriteChr(']');
+
+	return value;
 }
 
 // Write OK/Fail 

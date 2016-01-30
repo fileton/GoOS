@@ -1,5 +1,5 @@
 /********************************************************
- *	GoOS C Library - bda.h
+ *	GoOS C library - cpuid.h
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -8,8 +8,15 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#include "stdgcl.h"
-#include "stdint.h"
+#ifndef __GCL_CPUID_H__
+#define __GCL_CPUID_H__ 1
 
+#include <stdgcl.h>
 
-#define bda_vga_ioport (*(volatile uint16_t *)(0x463))
+/* 
+	Various functions for getting detailed CPU information.
+*/
+
+bool	cpuinfo_isIntel	();
+
+#endif

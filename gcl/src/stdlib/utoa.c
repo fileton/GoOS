@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS C library - utoa.c
+ *	GoOS C library - utoa.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -11,7 +11,7 @@
 #include <stdgcl.h>
 
 void 
-*utoa(uint input, char *buffer, int radix)
+*utoa(uint_t input, char *buffer, int_t radix)
 {
 	static char symbols[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -19,8 +19,8 @@ void
 	if (radix < 2 || radix > 36) return (void *) 0;
 
 	// calculate size of resulting string
-	uint count = 0;
-	int value = input;
+	uint_t count = 0;
+	int_t value = input;
 
 	// Calculate number of symbols
 	do count++; while (value /= radix);	

@@ -11,20 +11,20 @@
 #include <stdgcl.h>
 
 void 
-*itoa(int input, char *buffer, int radix)
+*itoa(int_t input, char *buffer, int_t radix)
 {
 	static char symbols[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 	// detect sign and make number positive
-	int sign = input;
+	int_t sign = input;
 	if (sign < 0) input = -input;
 
 	// check if base is within range, if not return null pointer
 	if (radix < 2 || radix > 36) return (void *) 0;
 
 	// calculate size of resulting string
-	uint count = 0;
-	int value = input;
+	uint_t count = 0;
+	int_t value = input;
 
 	// If it's a negative number we need an extra space for the sign
 	if (sign < 0) count++;
