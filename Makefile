@@ -13,6 +13,8 @@ all: clean lib ldr cd
 
 clean:
 	rm -rf iso/* *.iso
+	cd gcl && make clean TARGET=i686
+	cd gcl && make clean TARGET=x86_64
 
 ldr: iso/boot/ldr.elf
 

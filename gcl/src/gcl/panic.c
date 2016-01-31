@@ -21,7 +21,15 @@ gclAbort(void)
 void
 gclPanicString(char *str)
 {
-
+	tmColor = tmMakeColor(RED, BLACK);
+	tmWriteChr('[');
+	tmColor = tmMakeColor(WHITE, BLACK);
+	tmWrite("Panic: ");
+	tmColor = tmMakeColor(LIGHT_GREY, BLACK);
+	tmWrite(str);
+	tmColor = tmMakeColor(RED, BLACK);
+	tmColumn = 79;
+	tmWriteChr(']');
 	gclAbort();
 }
 

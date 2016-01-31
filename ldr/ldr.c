@@ -19,16 +19,12 @@
 void
 ldrMain(void)
 {	
-	// uneG letn Ieni
-	// Genu	ntel ineI
-	// BX+DX+CX = GenuineIntel :) cpuinfo opcode works
-
+	// Init textmode
 	tmInit(0xB8000);
 
-	tmWrite("Are we running on an Intel CPU?");
-	
-	if (!tmBoolStr(cpuinfo_isIntel(), "Yes", "No"))
-	{
-		tmWrite("Loader Panic: Only Intel CPU's are supported at this time.");
-	}
+	// Is it a 64bit cpu from Intel or AMD?
+	tmWrite("Is your CPU supported?");
+	BochsBreak();
+	gclPanicBoolStr(cpuid_cpu_supported(), "Yes", "No", "Sorry, only 64bit CPU's from Intel or AMD are supported.");
+	BochsWrite("Can we write to the debug console?\r\n");
 }

@@ -13,10 +13,17 @@
 
 #include <stdgcl.h>
 
-/* 
-	Various functions for getting detailed CPU information.
-*/
+// Checks if the CPU is supported.
+bool cpuid_cpu_supported();
 
-bool	cpuinfo_isIntel	();
+/* Check if cpuid opcode is supported */
+static
+inline
+bool
+cpuid_check()
+{
+	return !(__get_cpuid_max(0, 0) == 0);
+}
+
 
 #endif
