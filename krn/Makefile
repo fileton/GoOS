@@ -1,5 +1,5 @@
 #********************************************************
-#* 				GoOS Loader - Makefile
+#* 				GoOS Kernel - Makefile
 #******************************************************** 
 #* Copyright (c) 2016, Gert Nutterts
 #* All rights reserved
@@ -9,39 +9,39 @@
 #********************************************************/
 
 # Target
-TARGET = i686-elf
+TARGET = x86_64-elf
 
 # Tools
 GCC = $(TARGET)-gcc
 AS = $(TARGET)-as 	
 
 # Default options
-AOPS = --warn --fatal-warnings
-COPS = -Wall -ffreestanding -O2 -nostdlib
+AOPS = --warn --fatal-warnings 
+COPS = -O3 -Wall -ffreestanding -mcmodel=kernel -mno-mmx -mno-sse -mno-sse2 -nostdlib
 
 # Source objects
-OBJS = boot.s.o ldr.c.o textmode.c.o panic.c.o cpuid.c.o memcpy.c.o strlen.c.o utoa.c.o itoa.c.o
+OBJS = boot.s.o krn.c.o
 
 # Built loader
-all: clean ldr.elf ldr.asm
+all: clean krn.elf krn.asm
 
 # Cleanup
 clean:
 	rm -rf *.o
 	rm -rf *.asm
 
-ldr.asm: ldr.elf
-	objdump -d ../iso/boot/ldr.elf > ldr.asm
+krn.asm: krn.elf
+	objdump -d ../iso/boot/krn.elf > krn.asm
 
-ldr.elf: $(OBJS)
+krn.elf: $(OBJS)
 	mkdir -p ../iso/boot
-	$(GCC) -T ldr.ld -o ../iso/boot/ldr.elf $(COPS) $(OBJS) -lgcc
+	$(GCC) -T krn.ld -o ../iso/boot/krn.elf $(COPS) $(OBJS) -lgcc -z max-page-size=0x1000
 	rm -rf $(OBJS)
 
 # Compile C sources
 %.c.o: %.c  
-	$(GCC) $(COPS) -o $@ -c $< -I.
+	$(GCC) $(COPS) -o $@ -c $< 
 
 # Compile assembly sources
 %.s.o: %.s 
-	$(AS) $(AOPS) -o $@ -c $< 
+	$(AS) $(AOPS) -o $@ -c $<  

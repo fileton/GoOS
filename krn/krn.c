@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS C library - stdlib.h
+ *	GoOS Loader - krn.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -8,13 +8,14 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#ifndef __STDLIB_H__
-#define __STDLIB_H__ 1
+#include "krn.h"
+#include "stdint.h"
 
-#include <stdgcl.h>
+void
+main(void)
+{	
+	uint8_t *v = (uint8_t *) 0xFFFFFFF8000B8000;
+	v[0] = '@';
+}
 
-void *itoa	(int_t input, char *buffer, int_t radix); 	// Int to String
-void *utoa	(uint_t input, char *buffer, int_t radix); 	// Unsigned Int to String
-
-
-#endif
+// 0xFFFFFFF8000B8000

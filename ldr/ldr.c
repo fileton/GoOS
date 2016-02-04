@@ -8,12 +8,6 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#include <stdgcl.h>
-
-/*
-	Checks & prepares the system for loading the 64bit kernel.
-*/
-
 #include "ldr.h"
 
 void
@@ -26,5 +20,4 @@ ldrMain(void)
 	tmWrite("Is your CPU supported?");
 	BochsBreak();
 	gclPanicBoolStr(cpuid_cpu_supported(), "Yes", "No", "Sorry, only 64bit CPU's from Intel or AMD are supported.");
-	BochsWrite("Can we write to the debug console?\r\n");
 }

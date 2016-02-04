@@ -9,24 +9,22 @@
 #********************************************************/
 
 
-all: clean lib ldr cd 
+all: clean ldr krn cd 
 
 clean:
-	rm -rf iso/* *.iso
-	cd gcl && make clean TARGET=i686
-	cd gcl && make clean TARGET=x86_64
+	rm -rf iso/boot/* *.iso
 
 ldr: iso/boot/ldr.elf
 
+krn: iso/boot/krn.elf
+
 cd: GoOS.iso
 
-lib:
-	cd gcl && make TARGET=i686
-	cd gcl && make TARGET=x86_64
-
 iso/boot/ldr.elf:
-	mkdir -p iso/boot
 	cd ldr && make all
+
+iso/boot/krn.elf:
+	cd krn && make all
 
 GoOS.iso: 
 	mkdir -p iso/boot/grub

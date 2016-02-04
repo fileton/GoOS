@@ -14,15 +14,29 @@ endif
 
 ifeq ($(TARGET),i686)
 # i686-elf compile options
+#
+# Compiles a subset of the GCL for the loader
 AOPS = --warn --fatal-warnings
-COPS = -Wall -ffreestanding -O2 -nostdlib
+COPS = -Wall -ffreestanding -O3 -nostdlib
+C_OBJS = 	src/gcl/textmode.c.o \
+			src/gcl/cpuid.c.o \
+			src/gcl/panic.c.o \
+			src/stdlib/utoa.c.o \
+			src/stdlib/itoa.c.o \
+			src/string/memcpy.c.o \
+			src/string/strlen.c.o
 VALID_TARGET = 1
 endif
 
 ifeq ($(TARGET), x86_64)
+#
 # x86_64-elf compile options
+#
+# Will compile the entire GCL for the kernel
+
 AOPS = --warn --fatal-warnings
-COPS = -Wall -ffreestanding -mcmodel=kernel -mno-mmx -mno-sse -mno-sse2 -DMKL_ILP64 -nostdlib
+COPS = -O3 -Wall -ffreestanding -mcmodel=kernel -gdwarf2 -mno-mmx -mno-sse -mno-sse2 -nostdlib
+C_OBJS = $(shell find src -type f -name "*.c" | xargs | sed 's/\.c/\.c\.o/g')
 VALID_TARGET = 1
 endif
 
@@ -36,9 +50,6 @@ AS = $(TARGET)-elf-as
 LD = $(TARGET)-elf-ld
 OBJDUMP = $(TARGET)-elf-objdump
 
-# Find all C files in ./lib and append '.o'
-C_OBJS = $(shell find src -type f -name "*.c" | xargs | sed 's/\.c/\.c\.o/g')
-
 all: clean $(C_OBJS)
 	$(LD) -r $(C_OBJS) -o lib/gcj-$(TARGET).lib
 	rm -rf $(C_OBJS)
@@ -50,7 +61,7 @@ clean:
 
 # Compile rules
 %.c.o: %.c  
-	$(GCC) $(COPS) -o $@ -c $< -Iinclude
+	$(GCC) $(COPS) -o $@ -c $< 
 
 %.s.o: %.s 
 	$(AS) $(AOPS) -o $@ -c $<

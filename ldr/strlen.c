@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS C library - stdlib.h
+ *	GoOS Loader - strlen.c
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -8,13 +8,12 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#ifndef __STDLIB_H__
-#define __STDLIB_H__ 1
+#include <ldr.h>
 
-#include <stdgcl.h>
-
-void *itoa	(int_t input, char *buffer, int_t radix); 	// Int to String
-void *utoa	(uint_t input, char *buffer, int_t radix); 	// Unsigned Int to String
-
-
-#endif
+ size_t
+ strlen(const char* str)
+ {
+	size_t len = 0;
+	while (str[len] != 0 ) len++;
+	return len;
+}

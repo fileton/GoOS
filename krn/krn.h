@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS C library - stdlib.h
+ * 				GoOS Kernel - krn.h
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -8,13 +8,10 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
-#ifndef __STDLIB_H__
-#define __STDLIB_H__ 1
+#ifndef __KRN_H__
+#define __KRN_H__
 
-#include <stdgcl.h>
-
-void *itoa	(int_t input, char *buffer, int_t radix); 	// Int to String
-void *utoa	(uint_t input, char *buffer, int_t radix); 	// Unsigned Int to String
-
+/* Functions prototypes */
+void 	abort	(void);	// abort execution
 
 #endif
