@@ -15,25 +15,45 @@ SECTIONS
 
 	.text BLOCK(4K) : ALIGN(4K)
 	{
+		_multiboot_start = .;
 		*(.multiboot)
+		_multiboot_end = .;
+		. = ALIGN(4K);
+		_text_start = .;
 		*(.text)
+		_text_end = .;
 	}
 
 	.rodata BLOCK(4K) : ALIGN(4K)
 	{
+		_rodata_start = .;
 		*(.rodata)
+		_rodata_end = .;
 	}
 
 	.data BLOCK(4K) : ALIGN(4K)
 	{
+		_data_start = .;
 		*(.data)
+		_data_end = .;
 	}
 
 	.bss BLOCK(4K) : ALIGN(4K)
 	{
+		_bss_start = .;
 		*(COMMON)
+		. = ALIGN(4K);
 		*(.bss)
+		. = ALIGN(4K);
 		*(.stack)
+		_bss_end = .;
+	}
+	
+	. = 0x180000;
+	.heap BLOCK(4K) : ALIGN(4K)
+	{
+		_heap_start = .;
 		*(.heap)
+		_heap_end = .;
 	}
 }

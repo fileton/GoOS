@@ -8,8 +8,10 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
+#include <ldr.h>
+
 void 
-*itoa(int input, char *buffer, int radix)
+*itoa(int64_t input, char *buffer, int radix)
 {
 	static char symbols[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -22,7 +24,7 @@ void
 
 	// calculate size of resulting string
 	int count = 0;
-	int value = input;
+	int64_t value = input;
 
 	// If it's a negative number we need an extra space for the sign
 	if (sign < 0) count++;

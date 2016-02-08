@@ -20,7 +20,16 @@ AOPS = --warn --fatal-warnings
 COPS = -Wall -ffreestanding -O2 -nostdlib
 
 # Source objects
-OBJS = boot.s.o ldr.c.o textmode.c.o panic.c.o cpuid.c.o memcpy.c.o strlen.c.o utoa.c.o itoa.c.o
+OBJS = 	boot.s.o 		\
+		ldr.c.o 		\
+		textmode.c.o 	\
+		panic.c.o 		\
+		cpuid.c.o 		\
+		memcpy.c.o 		\
+		strlen.c.o 		\
+		utoa.c.o 		\
+		itoa.c.o 		\
+		multiboot.c.o
 
 # Built loader
 all: clean ldr.elf ldr.asm

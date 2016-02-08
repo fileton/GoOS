@@ -1,5 +1,5 @@
 /********************************************************
- * 				GoOS Loader - ldr.h
+ *	GoOS Loader - ldr.h
  ******************************************************** 
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
@@ -16,9 +16,25 @@
 #include <stdbool.h>
 #include <cpuid.h>
 
+#include "multiboot.h"
+#include "elf64.h"
+#include "paging.h"
+
 
 // Get pointer to base vga ioport
 #define bda_vga_ioport (*(volatile uint16_t *)(0x463 & 0xFFFF))
+
+extern void *_heap;
+extern void *_text_start;
+extern void *_text_end;
+extern void *_rodata_start;
+extern void *_rodata_end;
+extern void *_data_start;
+extern void *_data_end;
+extern void *_bss_start;
+extern void *_bss_end;
+extern void *_heap_start;
+extern void *_heap_end;
 
 // From assembler
 extern void _abort(void);
@@ -67,16 +83,17 @@ void 	tmWriteAt	(char, uint8_t, size_t, size_t);
 void	tmWriteChr	(char c);
 void 	tmWrite 	(const char *);
 void	tmScroll	(void);
-void	tmWriteInt	(int);
-void	tmWriteUInt	(unsigned int);
-void	tmWriteHex	(unsigned int);
-void	tmWriteBin	(unsigned int);
-void	tmWriteOct	(unsigned int);
+void	tmWriteInt	(int64_t);
+void	tmWriteUInt	(uint64_t);
+void	tmWriteHex	(uint64_t);
+void	tmWriteBin	(uint64_t);
+void	tmWriteOct	(uint64_t);
 void	tmCRLF		(void);
 void    tmSetCursor	(size_t, size_t);
-bool	tmBoolStr	(bool value, char *trueStr, char *falseStr);
+bool	tmBoolStr	(bool, char *, char *);
 
-tmCursor_t 	tmGetCursor (void);
+multiboot_module_t 	*findkernel	(multiboot_info_t *);
+tmCursor_t 			tmGetCursor (void);
 
 // Make color
 inline
@@ -99,8 +116,8 @@ tmMakeEntry(char c, uint8_t color)
 /*** MISC FUNCTIONS ***/
 
 void 	abort	(void);										// abort execution
-void 	*itoa	(int input, char *buffer, int radix); 	// Int to String
-void 	*utoa	(unsigned int input, char *buffer, int radix); 	// Unsigned Int to String
+void 	*itoa	(int64_t input, char *buffer, int radix); 	// Int to String
+void 	*utoa	(uint64_t input, char *buffer, int radix); 	// Unsigned Int to String
 size_t	strlen	(const char* str);							// get length of string
 void 	memcpy	(void *dst, const void *src, size_t len);	// copy len number of bytes from src to ds
 

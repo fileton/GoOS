@@ -103,27 +103,27 @@ tmScroll(void)
 
 // Write Int
 void
-tmWriteInt(int value)
+tmWriteInt(int64_t value)
 {
-	char str[(unsigned int) itoa(value, (char *) 0, 10)];
+	char str[(int) itoa(value, (char *) 0, 10)];
 	itoa(value, (char *) str, 10);
 	tmWrite((char *) str);
 }
 
 // Write unsigned int
 void
-tmWriteUInt(unsigned int value)
+tmWriteUInt(uint64_t value)
 {
-	char str[(unsigned int) utoa(value, (char *) 0, 10)];
+	char str[(int) utoa(value, (char *) 0, 10)];
 	utoa(value, (char *) str, 10);
 	tmWrite((char *) str);	
 }
 
 // Write hex
 void
-tmWriteHex(unsigned int value)
+tmWriteHex(uint64_t value)
 {
-	char str[(unsigned int) utoa(value, (char *) 0, 16)];
+	char str[(int) utoa(value, (char *) 0, 16)];
 	utoa(value, (char *) str, 16);
 	tmWrite("0x");
 	tmWrite((char *) str);		
@@ -131,18 +131,18 @@ tmWriteHex(unsigned int value)
 
 // Write binary
 void
-tmWriteBin(unsigned int value)
+tmWriteBin(uint64_t value)
 {
-	char str[(unsigned int) utoa(value, (char *) 0, 2)];
+	char str[(int) utoa(value, (char *) 0, 2)];
 	utoa(value, (char *) str, 2);
 	tmWrite((char *) str);			
 }
 
 // Write octal
 void
-tmWriteOct(unsigned int value)
+tmWriteOct(uint64_t value)
 {
-	char str[(unsigned int) utoa(value, (char *) 0, 8)];
+	char str[(int) utoa(value, (char *) 0, 8)];
 	utoa(value, (char *) str, 8);
 	tmWrite((char *) str);			
 }

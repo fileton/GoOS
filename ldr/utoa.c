@@ -8,8 +8,10 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
+#include <ldr.h>
+
 void 
-*utoa(unsigned int input, char *buffer, unsigned int radix)
+*utoa(uint64_t input, char *buffer, int radix)
 {
 	static char symbols[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -17,8 +19,8 @@ void
 	if (radix < 2 || radix > 36) return (void *) 0;
 
 	// calculate size of resulting string
-	unsigned int count = 0;
-	unsigned int value = input;
+	int count = 0;
+	uint64_t value = input;
 
 	// Calculate number of symbols
 	do count++; while (value /= radix);	
