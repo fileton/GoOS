@@ -1,9 +1,9 @@
 /********************************************************
  * 				GoOS Loader - ldr.ld
- ******************************************************** 
+ ********************************************************
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
- *  
+ *
  * Released under the BSD 3-clause license.
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
@@ -18,7 +18,6 @@ SECTIONS
 		_multiboot_start = .;
 		*(.multiboot)
 		_multiboot_end = .;
-		. = ALIGN(4K);
 		_text_start = .;
 		*(.text)
 		_text_end = .;
@@ -48,7 +47,7 @@ SECTIONS
 		*(.stack)
 		_bss_end = .;
 	}
-	
+
 	. = 0x180000;
 	.heap BLOCK(4K) : ALIGN(4K)
 	{

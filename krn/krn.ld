@@ -1,9 +1,9 @@
 /********************************************************
  * 				GoOS Kernel - krn.ld
- ******************************************************** 
+ ********************************************************
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
- *  
+ *
  * Released under the BSD 3-clause license.
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
@@ -11,7 +11,7 @@
 ENTRY(_start)
 SECTIONS
 {
-	. = 0xFFFFFFF80200000;
+	. = 0xFFFFFFF800200000;
 
     .text BLOCK(4K) : ALIGN(4K)
     {

@@ -1,9 +1,9 @@
 #********************************************************
 #* 				GoOS Kernel - Makefile
-#******************************************************** 
+#********************************************************
 #* Copyright (c) 2016, Gert Nutterts
 #* All rights reserved
-#*  
+#*
 #* Released under the BSD 3-clause license.
 #* https://github.com/nutterts/GoOS/blob/master/LICENSE
 #********************************************************/
@@ -13,10 +13,10 @@ TARGET = x86_64-elf
 
 # Tools
 GCC = $(TARGET)-gcc
-AS = $(TARGET)-as 	
+AS = $(TARGET)-as
 
 # Default options
-AOPS = --warn --fatal-warnings 
+AOPS = --warn --fatal-warnings
 COPS = -O3 -Wall -ffreestanding -mcmodel=kernel -mno-mmx -mno-sse -mno-sse2 -nostdlib
 
 # Source objects
@@ -31,7 +31,7 @@ clean:
 	rm -rf *.asm
 
 krn.asm: krn.elf
-	objdump -d ../iso/boot/krn.elf > krn.asm
+	x86_64-elf-objdump -d ../iso/boot/krn.elf > krn.asm
 
 krn.elf: $(OBJS)
 	mkdir -p ../iso/boot
@@ -39,9 +39,9 @@ krn.elf: $(OBJS)
 	rm -rf $(OBJS)
 
 # Compile C sources
-%.c.o: %.c  
-	$(GCC) $(COPS) -o $@ -c $< 
+%.c.o: %.c
+	$(GCC) $(COPS) -o $@ -c $<
 
 # Compile assembly sources
-%.s.o: %.s 
-	$(AS) $(AOPS) -o $@ -c $<  
+%.s.o: %.s
+	$(AS) $(AOPS) -o $@ -c $<

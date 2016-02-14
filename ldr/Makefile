@@ -1,9 +1,9 @@
 #********************************************************
 #* 				GoOS Loader - Makefile
-#******************************************************** 
+#********************************************************
 #* Copyright (c) 2016, Gert Nutterts
 #* All rights reserved
-#*  
+#*
 #* Released under the BSD 3-clause license.
 #* https://github.com/nutterts/GoOS/blob/master/LICENSE
 #********************************************************/
@@ -13,23 +13,24 @@ TARGET = i686-elf
 
 # Tools
 GCC = $(TARGET)-gcc
-AS = $(TARGET)-as 	
+AS = $(TARGET)-as
 
 # Default options
 AOPS = --warn --fatal-warnings
 COPS = -Wall -ffreestanding -O2 -nostdlib
 
 # Source objects
-OBJS = 	boot.s.o 		\
-		ldr.c.o 		\
-		textmode.c.o 	\
-		panic.c.o 		\
-		cpuid.c.o 		\
-		memcpy.c.o 		\
-		strlen.c.o 		\
-		utoa.c.o 		\
-		itoa.c.o 		\
-		multiboot.c.o
+OBJS = 	boot.s.o 			\
+				ldr.c.o 			\
+				textmode.c.o 	\
+				panic.c.o 		\
+				cpuid.c.o 		\
+				memcpy.c.o 		\
+				strlen.c.o 		\
+				utoa.c.o 			\
+				itoa.c.o 			\
+				heap.c.o			\
+				memset.c.o
 
 # Built loader
 all: clean ldr.elf ldr.asm
@@ -40,7 +41,7 @@ clean:
 	rm -rf *.asm
 
 ldr.asm: ldr.elf
-	objdump -d ../iso/boot/ldr.elf > ldr.asm
+	i686-elf-objdump -d ../iso/boot/ldr.elf > ldr.asm
 
 ldr.elf: $(OBJS)
 	mkdir -p ../iso/boot
@@ -48,9 +49,9 @@ ldr.elf: $(OBJS)
 	rm -rf $(OBJS)
 
 # Compile C sources
-%.c.o: %.c  
+%.c.o: %.c
 	$(GCC) $(COPS) -o $@ -c $< -I.
 
 # Compile assembly sources
-%.s.o: %.s 
-	$(AS) $(AOPS) -o $@ -c $< 
+%.s.o: %.s
+	$(AS) $(AOPS) -o $@ -c $<

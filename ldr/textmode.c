@@ -1,9 +1,9 @@
 /********************************************************
  *	GoOS Loader - textmode.c
- ******************************************************** 
+ ********************************************************
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
- *  
+ *
  * Released under the BSD 3-clause license.
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
@@ -15,7 +15,7 @@ size_t 		tmColumn;
 uint8_t		tmColor;
 uint16_t	*tmBuffer;
 
-// Initialize 
+// Initialize
 void
 tmInit()
 {
@@ -50,7 +50,7 @@ tmWriteChr(char c)
 		{
 			tmScroll();
 			tmRow--;
-		}	
+		}
 		break;
 	default:
 		tmWriteAt(c, tmColor, tmRow, tmColumn);
@@ -78,7 +78,7 @@ tmCRLF(void)
 }
 
 // Write string
-void 
+void
 tmWrite(const char* str)
 {
 	size_t len = strlen(str);
@@ -93,12 +93,12 @@ tmScroll(void)
 	uint16_t empty = tmMakeEntry(' ', tmColor);
 
 	// Copy all lines to the one above them
-	for (index = 1; index < TEXTMODE_HEIGHT; index++) 
+	for (index = 1; index < TEXTMODE_HEIGHT; index++)
 		memcpy(&tmBuffer[(index-1) * TEXTMODE_WIDTH], &tmBuffer[(index * TEXTMODE_WIDTH)], TEXTMODE_WIDTH * 2);
-	
+
 	// Clear lowest line
-	for (index = 0; index < TEXTMODE_WIDTH; index++) 
-		tmBuffer[(TEXTMODE_HEIGHT - 1) * TEXTMODE_WIDTH + index] = empty; 
+	for (index = 0; index < TEXTMODE_WIDTH; index++)
+		tmBuffer[(TEXTMODE_HEIGHT - 1) * TEXTMODE_WIDTH + index] = empty;
 }
 
 // Write Int
@@ -116,7 +116,7 @@ tmWriteUInt(uint64_t value)
 {
 	char str[(int) utoa(value, (char *) 0, 10)];
 	utoa(value, (char *) str, 10);
-	tmWrite((char *) str);	
+	tmWrite((char *) str);
 }
 
 // Write hex
@@ -126,7 +126,7 @@ tmWriteHex(uint64_t value)
 	char str[(int) utoa(value, (char *) 0, 16)];
 	utoa(value, (char *) str, 16);
 	tmWrite("0x");
-	tmWrite((char *) str);		
+	tmWrite((char *) str);
 }
 
 // Write binary
@@ -135,7 +135,7 @@ tmWriteBin(uint64_t value)
 {
 	char str[(int) utoa(value, (char *) 0, 2)];
 	utoa(value, (char *) str, 2);
-	tmWrite((char *) str);			
+	tmWrite((char *) str);
 }
 
 // Write octal
@@ -144,7 +144,7 @@ tmWriteOct(uint64_t value)
 {
 	char str[(int) utoa(value, (char *) 0, 8)];
 	utoa(value, (char *) str, 8);
-	tmWrite((char *) str);			
+	tmWrite((char *) str);
 }
 
 // Write bool
@@ -158,7 +158,7 @@ tmWriteBool(bool value)
 }
 
 // Check bool and write trueStr(ing) or falseStr(ing)
-// Returns boolean value 
+// Returns boolean value
 bool
 tmBoolStr(bool value, char *trueStr, char *falseStr)
 {
@@ -166,14 +166,14 @@ tmBoolStr(bool value, char *trueStr, char *falseStr)
 		tmColumn = TEXTMODE_WIDTH - strlen(trueStr) - 2;
 	else
 		tmColumn = TEXTMODE_WIDTH - strlen(falseStr) - 2;
-	
+
 	tmWriteChr('[');
-	
+
 	uint8_t oldcolor = tmColor;
 
 	if (value)
 	{
-		tmColor = tmMakeColor(GREEN, oldcolor >> 4);
+		tmColor = tmMakeColor(CYAN, oldcolor >> 4);
 		tmWrite(trueStr);
 	} else {
 		tmColor = tmMakeColor(RED, oldcolor >> 4);
@@ -186,7 +186,7 @@ tmBoolStr(bool value, char *trueStr, char *falseStr)
 	return value;
 }
 
-// Write OK/Fail 
+// Write OK/Fail
 void
 tmOkFail(bool ok)
 {
@@ -194,9 +194,9 @@ tmOkFail(bool ok)
 		tmColumn = TEXTMODE_WIDTH - 4;
 	else
 		tmColumn = TEXTMODE_WIDTH - 6;
-	
+
 	tmWriteChr('[');
-	
+
 	uint8_t oldcolor = tmColor;
 
 	if (ok)
@@ -212,7 +212,7 @@ tmOkFail(bool ok)
 	tmWriteChr(']');
 }
 
-// Write buffer 
+// Write buffer
 void
 tmWriteBuffer(char *buffer, size_t len)
 {
