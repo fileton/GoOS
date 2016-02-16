@@ -1,9 +1,9 @@
 /********************************************************
  *	GoOS Loader - elf64.h
- ******************************************************** 
+ ********************************************************
  * Copyright (c) 2016, Gert Nutterts
  * All rights reserved
- *  
+ *
  * Released under the BSD 3-clause license.
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
@@ -23,6 +23,15 @@
 enum {
 	ET_REL 	= 1,
 	ET_EXEC = 2
+};
+
+enum {
+	SHT_PROGBITS = 1,
+	SHT_NOBITS = 8
+};
+
+enum {
+	SHF_ALLOC = 2
 };
 
 struct elf64_ident {
@@ -81,32 +90,3 @@ struct elf64_p_header {
 typedef struct elf64_p_header elf64_p_header_t;
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

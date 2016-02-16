@@ -55,4 +55,10 @@ SECTIONS
 		*(.heap)
 		_heap_end = .;
 	}
+  _end = .;
+
+  /DISCARD/ :
+  {
+    *(.comment)
+  }
 }

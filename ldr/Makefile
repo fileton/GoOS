@@ -30,7 +30,8 @@ OBJS = 	boot.s.o 			\
 				utoa.c.o 			\
 				itoa.c.o 			\
 				heap.c.o			\
-				memset.c.o
+				memset.c.o		\
+				ptkernel.c.o
 
 # Built loader
 all: clean ldr.elf ldr.asm

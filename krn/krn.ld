@@ -11,7 +11,7 @@
 ENTRY(_start)
 SECTIONS
 {
-	. = 0xFFFFFFF800200000;
+	. = 0xFFFFFFFF80200000;
 
     .text BLOCK(4K) : ALIGN(4K)
     {
@@ -41,4 +41,9 @@ SECTIONS
    }
 
    _end = .;
+
+   /DISCARD/ :
+   {
+     *(.comment)
+   }
 }

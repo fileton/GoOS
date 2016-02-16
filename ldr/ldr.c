@@ -16,7 +16,6 @@ lis_t *lis;
 // implementations are below entrypoint
 inline void initLis(multiboot_info_t *);
 inline void sanityCheck(uint);
-
 inline multiboot_module_t* getKrnMod(multiboot_info_t *);
 
 /*** ENTRYPOINT ***/
@@ -34,47 +33,46 @@ ldrMain(uint magic, multiboot_info_t *mbinfo)
 	multiboot_module_t *krnMod = getKrnMod(mbinfo);
 	gclPanicBoolStr(!(krnMod == NULL), "Found", "Fail", "Kernel not found.");
 
-	tmWrite("Kernel found at ");
-	tmWriteHex((uint) krnMod->mod_start);
-	tmWrite(".\r\n");
+/** PAGING **/
 
-/*** INITIAL PAGE TABLES ***/
+	tmWrite("Creating page tables for first 2MiB and the kernel.");
 
-	tmWrite("\r\n"); // For readability
-  tmWrite("Creating initial page tables for the first 2MiB:\r\n");
-	// Highest level - 512GB pages
-	uint64_t *pml4 = amalloc(PAGETABLE_SIZE, PAGETABLE_ALIGNMENT);
-	memset (pml4, 0, PAGETABLE_SIZE); // Just to be sure
+	// Create tables
+	pagemap_t *pml = new_pagemap();
+	pagedirptr_t *pdp = new_pagedirptr();
+	pagedir_t *pd = new_pagedir();
+	pagetable_t *pt = new_pagetable();
 
-	tmWrite("- PML4 page table at ");
-	tmWriteHex((unsigned)pml4);
-	tmWrite(".\r\n");
+	// Link them together
+	pml[511] = entry4pagedirptr(pdp);
+	pdp[510] = entry4pagedir(pd);
+	pd[0] = entry4pagetable(pt);
 
-	// Highest 512GB in 1GB pages
-	uint64_t *pdp511 = amalloc(PAGETABLE_SIZE, PAGETABLE_ALIGNMENT);
-	memset (pdp511, 0, PAGETABLE_SIZE); // Just to be sure
+	// Map first 2MiB
+	//- Doing it in 4K pages instead of one 2M page so
+	//- we can reuse free pages later on.
+	for (int i = 0; i < 512; i++) {
+		pt[i].Present = true;
+		pt[i].Writable = true;
+		pt[i].WriteThrough = true;
+		pt[i].UserAccess = false;
+		pt[i].PhysicalBaseAddr = true;
+	}
 
-	tmWrite("- PDP page table at ");
-	tmWriteHex((unsigned)pdp511);
-	tmWrite(" for PML4[511].\r\n");
+	// Put page map in LIS
+	lis->pagemap += (unsigned)pml;
 
-	pml4[511] = MAKE_PML4E(PAGE_B4B(pdp511), 0, 0, 0, 0, 1, 1);
 
-	// Second to last GB in 2MB pages
-	uint64_t *pd511_510 = amalloc(PAGETABLE_SIZE, PAGETABLE_ALIGNMENT);
-	memset (pd511_510, 0, PAGETABLE_SIZE);
 
-	tmWrite("- PD page table at ");
-	tmWriteHex((unsigned)pd511_510);
-	tmWrite(" for PML4[511][510].");
 
-	tmBoolStr(true, "Done", "");
-	tmWrite("\r\n"); // For readability
 
-/*** PAGE TABLES FOR KERNEL ***/
 
-	tmWrite("Creating page tables for the kernel:\r\n");
+//	lis->pml4 += (unsigned)pml4;
 
+//	/* Kernel */
+//	bool error = ptkernel(krnMod, pml4);
+
+//	gclPanicBoolStr(!error, "Done", "Fail", "");
 
  };
 
@@ -124,6 +122,8 @@ initLis(multiboot_info_t *mbinfo)
 	lis->magic = LIS_MAGIC;
 	// 64bit addr of multiboot_info_t
 	lis->mbinfo = ((uint32_t) mbinfo) + KRNSPACE;
+	// Preset page table root to krnspace
+	lis->pagemap = KRNSPACE;
 };
 
 /* Check that the CPU supports the kernel */

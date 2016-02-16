@@ -11,16 +11,12 @@
 #ifndef __LDR_H__
 #define __LDR_H__ 1
 
+#define KRNSPACE 0xFFFFFFFF80000000
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <cpuid.h>
-
-#include "pagetables.h"
-#include "multiboot.h"
-#include "textmode.h"
-#include "elf64.h"
-#include "lis.h"
 
 typedef unsigned int uint;
 
@@ -142,5 +138,12 @@ BochsWrite(char *str)
 	for (size_t i = 0; i < len; i++)
 		BochsWriteChr(str[i]);
 }
+
+
+#include "pagetables.h"
+#include "multiboot.h"
+#include "textmode.h"
+#include "elf64.h"
+#include "lis.h"
 
 #endif
