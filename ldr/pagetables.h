@@ -55,9 +55,9 @@ union pagedirptr_entry {
     uint64_t NoExecute : 1;
   };
   struct {
-    uint64_t _ignore : 12;
+    uint64_t _ignore1 : 12;
     uint64_t PageAttributeTable : 1;
-    uint64_t Reserved : 17;
+    uint64_t _ignore2 : 17;
     uint64_t PhysicalBaseAddr : 22;
   };
   uint64_t Entry;
@@ -98,9 +98,9 @@ union pagedir_entry {
     uint64_t NoExecute : 1;
   };
   struct {
-    uint64_t _ignore : 12;
+    uint64_t _ignore1 : 12;
     uint64_t PageAttributeTable : 1;
-    uint64_t Reserved : 7;
+    uint64_t _ignore2 : 7;
     uint64_t PhysicalBaseAddr : 31;
   };
   uint64_t Entry;

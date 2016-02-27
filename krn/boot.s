@@ -1,9 +1,9 @@
 #********************************************************
 #* 				GoOS Loader - boot.s
-#******************************************************** 
+#********************************************************
 #* Copyright (c) 2016, Gert Nutterts
 #* All rights reserved
-#*  
+#*
 #* Released under the BSD 3-clause license.
 #* https://github.com/nutterts/GoOS/blob/master/LICENSE
 #********************************************************/
@@ -27,9 +27,8 @@ _stack_top:
 _start:
 	# Set stack
 	movabs $_stack_top, %rsp
-		
-	# Call our C entrypoint
-	call main
+
+	xchgw %bx, %bx
 	
 	# Abort execution
 	jmp _abort
@@ -37,7 +36,7 @@ _start:
 
 # Abort execution
 .section .text
-.global _start
+.global _abort
 .type _abort, @function
 _abort:
 	cli

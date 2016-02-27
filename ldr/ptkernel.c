@@ -10,125 +10,142 @@
 
 #include <ldr.h>
 
-/* Error codes */
-enum {
-  PTK_NOERROR = 0,
-  PTK_ERR_NOLOAD = 1,
-  PTK_ERR_MAP = 1
-};
-
 /* Function prototypes */
-//bool pkrn_elfmap(elf64_header_t*, elf64_s_header_t, uint64_t*);
+int pkrn_elfmap(elf64_header_t*, elf64_s_header_t, pagemap_t*);
 
 /* Map kernel into virtual address space */
-/*
 int
-ptkernel(multiboot_module_t *krnMod, uint64_t *pml4)
+ptkernel(multiboot_module_t *krnMod, pagemap_t *pm)
 {
 
   elf64_header_t *elf64 = (elf64_header_t *) krnMod->mod_start;
   if ((elf64->shoff == 0) | (elf64->shnum == 0)) return PTK_ERR_NOLOAD;
 
-  tmWrite("\r\n");
-  tmWriteHex((unsigned)elf64->shoff);
-  tmWrite("\r\n");
-  tmWriteHex((unsigned)elf64);
-  tmWrite("\r\n");
-
   uintptr_t addr = ((unsigned)elf64) + elf64->shoff;
   elf64_s_header_t *elf64_s = (elf64_s_header_t *) addr;
+  int error;
 
   for (int i = 0; i < elf64->shnum; i++)
   {
-    switch (elf64_s[i].type)
-    {
-      case SHT_PROGBITS:
-        if (elf64_s[i].flags & SHF_ALLOC) {
-          if (!pkrn_elfmap(elf64, elf64_s[i], pml4)) return PTK_ERR_MAP;
-        }
-        break;
-      case SHT_NOBITS:
-        tmWrite("NOBITS\r\n");
-        break;
+    if (elf64_s[i].flags & SHF_ALLOC) {
+        error = pkrn_elfmap(elf64, elf64_s[i], pm);
+        if (error) return error;
     }
   }
 
-  return true;
+  return PTK_NOERROR;
 }
-*/
+
 /* Create 4K page entry */
-/*
-bool
-pkrn_pagemap(uint64_t *pml4, uintptr_t src, uint64_t dst, uint64_t flags)
+int
+pkrn_pagemap(pagemap_t *pm, uintptr_t src, uint64_t dst, uint64_t flags)
 {
   // Get PDP
   int index = (dst >> 39) & 0x1FF;
   uintptr_t addr;
-  uint64_t *tbl;
-  uint64_t *newTbl;
+  pagedirptr_t *pdp;
+  pagedir_t *pd;
+  pagetable_t *pt;
 
-  if (pml4[index] == 0)
+  if (pm[index].Present)
   {
-    tbl = (uint64_t*) amalloc(PL_SIZE, PL_ALIGNMENT);
-    pml4[index] = PDPE(PL_Addr2Base(tbl), 0, 0, 0, 0, 0, 1, 1);
-  } else {
-    addr = pml4[index] & PT_BMASK32;
-    tbl = (uint64_t *) addr;
+    addr = pm[index].BaseAddr << 12;
+    pdp = ((pagedirptr_t *)(addr));
+  }
+  else
+  {
+    pdp = new_pagedirptr();
+    pm[index] = entry4pagedirptr(pdp);
   }
 
   // Get PD
   index = (dst >> 30) & 0x1FF;
 
-  if (tbl[index] == 0)
+  if (pdp[index].Present)
   {
-    newTbl = (uint64_t*) amalloc(PL_SIZE, PL_ALIGNMENT);
-    tbl[index] = PD(PL_Addr2Base(newTbl), 0, 0, 0, 0, 0, 1, 1);
-    tbl = newTbl;
-  } else {
-    addr = tbl[index] & PT_BMASK32;
-    tbl = (uint64_t *) addr;
+    addr = pdp[index].BaseAddr << 12;
+    pd = ((pagedir_t *)(addr));
+  }
+  else
+  {
+    pd = new_pagedir();
+    pdp[index] = entry4pagedir(pd);
   }
 
   // Get PT
   index = (dst >> 21) & 0x1FF;
 
-  if (tbl[index] == 0)
+  if (pd[index].Present)
   {
-    newTbl = (uint64_t*) amalloc(PL_SIZE, PL_ALIGNMENT);
-    tbl[index] =
-    tbl = newTbl;
-  } else {
-    addr = tbl[index] & PT_BMASK32;
-    tbl = (uint64_t *) addr;
+    addr = pd[index].BaseAddr << 12;
+    pt = ((pagetable_t *)(addr));
+  }
+  else
+  {
+    pt = new_pagetable();
+    pd[index] = entry4pagetable(pt);
   }
 
   // Get PT Entry
   index = (dst >> 12) & 0x1FF;
-  if (tbl[index] == 0) {
-    // Create Entry
-    tbl[index] = PE()
-  } else return false;
 
-  return true;
+  if (pt[index].Present)
+  {
+    // Page shouldn't be present unless it
+    // allready points to src.
+    if (!(pt[index].PhysicalBaseAddr == (src >> 12)))
+    {
+      return PTK_ERR_DOUBLEPAGE;
+    }
+  }
+  else
+  {
+    pt[index].PhysicalBaseAddr = src >> 12;
+    pt[index].UserAccess = false;
+    pt[index].Writable = ((flags & SHF_WRITE) > 0);
+    pt[index].WriteThrough = ((flags & SHF_WRITE) > 0);
+    pt[index].NoExecute = !((flags & SHF_EXECINSTR) > 0);
+    pt[index].Global = true;
+    pt[index].Present = true;
+  }
+
+  return PTK_NOERROR;
 }
-*/
+
 /* Create page table for ELF section */
-/*
-bool
-pkrn_elfmap(elf64_header_t* elf64, elf64_s_header_t section, uint64_t *pml4)
+int
+pkrn_elfmap(elf64_header_t* elf64, elf64_s_header_t section, pagemap_t *pm)
 {
-  uintptr_t src = ((unsigned)elf64) + section.offset;
+  uintptr_t src;
+  switch (section.type)
+  {
+  case SHT_PROGBITS:
+  {
+    src = ((unsigned)elf64) + section.offset;
+    break;
+  }
+  case SHT_NOBITS:
+  {
+    void *ptr = amalloc(section.size, 4096);
+    memset(ptr, 0, section.size);
+    src = (unsigned)ptr;
+    break;
+  }
+  default: return PTK_ERR_SECTIONUNKNOWN; // Unknown section that must be allocated
+  }
+
   uint64_t dst = section.addr;
   size_t pages = section.size / (1 << 12);
   if ((pages * (1 << 12)) < section.size) pages++;
 
+  int error;
   for (int i = 0; i < pages; i++)
   {
-    src += (i * (1 << 12));
-    dst += (i * (1 << 12));
-    if (!pkrn_pagemap(pml4, src, dst, section.flags)) return false;
+    error = pkrn_pagemap(pm, src, dst, section.flags);
+    if (error) return error;
+    src += (1 << 12);
+    dst += (1 << 12);
   }
 
-  return true;
+  return PTK_NOERROR;
 }
-*/

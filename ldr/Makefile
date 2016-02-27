@@ -21,6 +21,7 @@ COPS = -Wall -ffreestanding -O2 -nostdlib
 
 # Source objects
 OBJS = 	boot.s.o 			\
+				ldkernel.s.o	\
 				ldr.c.o 			\
 				textmode.c.o 	\
 				panic.c.o 		\
@@ -31,7 +32,7 @@ OBJS = 	boot.s.o 			\
 				itoa.c.o 			\
 				heap.c.o			\
 				memset.c.o		\
-				ptkernel.c.o
+				ptkernel.c.o	\
 
 # Built loader
 all: clean ldr.elf ldr.asm

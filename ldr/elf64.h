@@ -31,7 +31,9 @@ enum {
 };
 
 enum {
-	SHF_ALLOC = 2
+	SHF_WRITE = 1,
+	SHF_ALLOC = 2,
+	SHF_EXECINSTR = 4
 };
 
 struct elf64_ident {

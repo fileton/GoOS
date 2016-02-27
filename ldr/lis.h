@@ -14,8 +14,9 @@
 
 struct lis {
   uint32_t magic;         // 0xBOOTFEED
-  uint64_t mbinfo;        // addr of multiboot_info_t
-  uint64_t pagemap;          // addr of Pagetable root
+  uint32_t mbinfo;        // addr of multiboot_info_t
+  uint32_t pagemap;       // addr of Pagetable root
+  uint32_t gdtr;
 };
 typedef struct lis lis_t;
 

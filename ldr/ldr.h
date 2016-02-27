@@ -8,15 +8,25 @@
  * https://github.com/nutterts/GoOS/blob/master/LICENSE
  ********************************************************/
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+
+#ifndef __CPUID_H__
+#define __CPUID_H__ 1
+#include <cpuid.h>
+#endif
+
+#include "pagetables.h"
+#include "multiboot.h"
+#include "textmode.h"
+#include "elf64.h"
+#include "lis.h"
+
 #ifndef __LDR_H__
 #define __LDR_H__ 1
 
 #define KRNSPACE 0xFFFFFFFF80000000
-
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <cpuid.h>
 
 typedef unsigned int uint;
 
@@ -32,14 +42,15 @@ extern int _bss_end;
 extern int _heap_start;
 extern int _heap_end;
 
-// From assembler
+//*** ASM ***/
 extern void _abort(void);
+extern void _ldkernel(uint32_t pagemap);
 
 /*** HEAP ***/
 void *malloc(size_t);
 void *amalloc(size_t, uint);
 
-/*** MISC FUNCTIONS ***/
+/*** MISC ***/
 #define checkFlag(flags,bit)   ((flags) & (1 << (bit)))
 
 void 	abort	(void);										// abort execution
@@ -139,11 +150,12 @@ BochsWrite(char *str)
 		BochsWriteChr(str[i]);
 }
 
-
-#include "pagetables.h"
-#include "multiboot.h"
-#include "textmode.h"
-#include "elf64.h"
-#include "lis.h"
+/* Error codes used by ptkernel.c */
+enum {
+  PTK_NOERROR = 0,
+  PTK_ERR_NOLOAD = 1,
+  PTK_ERR_DOUBLEPAGE = 2,
+  PTK_ERR_SECTIONUNKNOWN = 3
+};
 
 #endif

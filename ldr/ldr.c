@@ -28,14 +28,14 @@ ldrMain(uint magic, multiboot_info_t *mbinfo)
 
 /*** FIND KERNEL ***/
 
-	tmWrite("Searching for module containing the kernel.");
+	tmWrite("Searching for the kernel.");
 
 	multiboot_module_t *krnMod = getKrnMod(mbinfo);
 	gclPanicBoolStr(!(krnMod == NULL), "Found", "Fail", "Kernel not found.");
 
 /** PAGING **/
 
-	tmWrite("Creating page tables for first 2MiB and the kernel.");
+	tmWrite("Creating page tables.");
 
 	// Create tables
 	pagemap_t *pml = new_pagemap();
@@ -48,7 +48,7 @@ ldrMain(uint magic, multiboot_info_t *mbinfo)
 	pdp[510] = entry4pagedir(pd);
 	pd[0] = entry4pagetable(pt);
 
-	// Map first 2MiB
+	// Map first 2MiB to 0xFFFFFFFF80200000
 	//- Doing it in 4K pages instead of one 2M page so
 	//- we can reuse free pages later on.
 	for (int i = 0; i < 512; i++) {
@@ -56,26 +56,61 @@ ldrMain(uint magic, multiboot_info_t *mbinfo)
 		pt[i].Writable = true;
 		pt[i].WriteThrough = true;
 		pt[i].UserAccess = false;
-		pt[i].PhysicalBaseAddr = true;
+		pt[i].PhysicalBaseAddr = i;
 	}
 
+	// Identity mapping first 2MiB
+	pagedirptr_t *im_pdp = new_pagedirptr();
+	pagedir_t *im_pd = new_pagedir();
+	pml[0] = entry4pagedirptr(im_pdp);
+	im_pdp[0] = entry4pagedir(im_pd);
+	im_pd[0].Present = true;
+	im_pd[0].Writable = true;
+	im_pd[0].WriteThrough = true;
+	im_pd[0].UserAccess = false;
+	im_pd[0].PhysicalBaseAddr = 0;
+	im_pd[0].PageSize = 1;
+
 	// Put page map in LIS
-	lis->pagemap += (unsigned)pml;
+	lis->pagemap = (unsigned) pml;
+
+	// Map kernel
+	int error = ptkernel(krnMod, pml);
+	char *errmsg = NULL;
+
+	switch (error)
+	{
+	case PTK_ERR_NOLOAD:
+	{
+		errmsg = "No loadable sections found in kernel.";
+		break;
+	}
+
+	case PTK_ERR_DOUBLEPAGE:
+	{
+		errmsg = "Two seperate sections claim the same virtual page.";
+		break;
+	}
+
+	case PTK_ERR_SECTIONUNKNOWN:
+	{
+		errmsg = "Unknown section type found in kernel.";
+		break;
+	}
+	// No error
+	case PTK_NOERROR: break;
+	// Unknown error
+	default: errmsg = "Undefined reason for panic.";
+	}
+
+	// Hopefully all went well
+	gclPanicBoolStr(!error, "Done", "Fail", errmsg);
 
 
-
-
-
-
-//	lis->pml4 += (unsigned)pml4;
-
-//	/* Kernel */
-//	bool error = ptkernel(krnMod, pml4);
-
-//	gclPanicBoolStr(!error, "Done", "Fail", "");
-
- };
-
+/*** JUMP TO 64BIT ***/
+	tmWrite("Jumping to kernel.");
+	_ldkernel(lis->pagemap);
+};
 
 /*** FUNCTIONS ***/
 
@@ -118,12 +153,8 @@ initLis(multiboot_info_t *mbinfo)
 {
 	// malloc must return 0x180000
 	lis = (lis_t *) malloc(sizeof(lis_t));
-  // set magic
 	lis->magic = LIS_MAGIC;
-	// 64bit addr of multiboot_info_t
-	lis->mbinfo = ((uint32_t) mbinfo) + KRNSPACE;
-	// Preset page table root to krnspace
-	lis->pagemap = KRNSPACE;
+	lis->mbinfo = (unsigned) mbinfo;
 };
 
 /* Check that the CPU supports the kernel */
